@@ -29,6 +29,16 @@ jobs:
 
           echo "RDP_CREDS=User: TOOLBOXLAP | Password: $password" >> $env:GITHUB_ENV
 
+          # تحقق من الصلاحيات وأظهرها في الـ logs
+          $groups = Get-LocalGroup | ForEach-Object {
+              try {
+                  if (Get-LocalGroupMember -Group $_.Name -Member "TOOLBOXLAP" -ErrorAction SilentlyContinue) {
+                      $_.Name
+                  }
+              } catch {}
+          }
+          Write-Host "User TOOLBOXLAP successfully created with membership in groups: $($groups -join ', ')"
+
           if (-not (Get-LocalUser -Name "TOOLBOXLAP")) {
               Write-Error "User creation failed"
               exit 1
